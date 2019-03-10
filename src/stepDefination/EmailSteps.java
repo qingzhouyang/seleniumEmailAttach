@@ -1,17 +1,15 @@
-/*
- * ECSE 428 Assignment B
- * 
- * 	Jiawei Ni   260615965
- *	jiawei.ni@mail.mcgill.ca
- *	
- *	Qingzhou Yang  260687570
- * 	qingzhou.yang@mail.mcgill.ca
- * 
- * */
+package stepDefination;
 
-package emailTest;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+
 
 import java.util.concurrent.TimeUnit;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -31,7 +29,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-public class seleniumScript {
+public class EmailSteps {
     private static WebDriver driver;
     private final static String SEND_EMAIL_URL = "https://mail.google.com/mail/u/0/#inbox?compose=new";
     private final static String SEND_BTN = "send";
@@ -43,65 +41,15 @@ public class seleniumScript {
     private final static String ATTACHMENTS = "\"I:\\study\\mcgill\\2019\\ecse 428\\a2\\CucumberTestAuto\\image.png\" \"I:\\study\\mcgill\\2019\\ecse 428\\a2\\CucumberTestAuto\\image2.png\"";
     
     
-	public static void main(String[] args) throws Throwable{
-		
-		//one recipient, one attachment
-		init();
-		login();
-		composeEmail();
-		fillRecipient(RECIPIENT);
-		attach(ATTACHMENT);
-		send();
-		confirmSent();
-		finish();
-		
-		//two recipients, one attachment
-		init();
-		login();
-		composeEmail();
-		fillRecipient(RECIPIENTS);
-		attach(ATTACHMENT);
-		send();
-		confirmSent();
-		finish();
-		
-		//one recipients, two attachments
-		init();
-		login();
-		composeEmail();
-		fillRecipient(RECIPIENT);
-		attach(ATTACHMENTS);
-		send();
-		confirmSent();
-		finish();
-		
-		//two recipients two attachments
-		init();		
-		login();
-		composeEmail();
-		fillRecipient(RECIPIENTS);
-		attach(ATTACHMENTS);
-		send();
-		confirmSent();
-		
-		
+	@BeforeClass
+	public void init() {
+		System.setProperty("webdriver.chrome.driver", "I:\\tool\\driver\\chromedriver_win32\\chromedriver.exe");
 	}
-	
-	// init state before tests
-	private static void init() {
+    
+	@Given("^I am logged in on a new email page$")
+	public void I_am_logged_in_on_a_new_email_page() throws Throwable {
     	System.setProperty("webdriver.chrome.driver", "I:\\tool\\driver\\chromedriver_win32\\chromedriver.exe");
 		driver = new ChromeDriver();
-	}
-	
-	//finish state
-	private static void finish() {
-		driver.manage().deleteAllCookies();
-		driver.quit();
-	}
-	
-  //Given("^I am logged in on a new email page$")
-    public static void login() throws Throwable {
-
 		driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
 		
@@ -121,31 +69,44 @@ public class seleniumScript {
     	Thread.sleep(1000);
         signInBtn.click();
         
-    }
-    
-    private static void composeEmail() {
+	}
+
+	@When("^I add an email address under \"To\"$")
+	public void I_add_an_email_address_under_To_() throws Throwable {
         WebElement composeBtn = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath("/html/body/div[7]/div[3]/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/div/div/div[1]/div/div")));
         composeBtn.click();
-    }
-    
-    
-    //Given("^When I fill an email address under ¡°To¡±$")
-    public static void fillRecipient(String recipient) {
-    	
-		driver.findElement(By.xpath("//textarea[@name='to']")).sendKeys(recipient);
+		driver.findElement(By.xpath("//textarea[@name='to']")).sendKeys(RECIPIENT);
 		driver.findElement(By.xpath("//input[@name='subjectbox']")).sendKeys("selenium test");
 
+	}
+	
 
-    }
-    private static void attach(String attchment) throws Throwable {
+	@When("^I add two email addresses under \"To\"$")
+	public void I_add_two_email_addresses_under_To_() throws Throwable {
+        WebElement composeBtn = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("/html/body/div[7]/div[3]/div/div[2]/div[1]/div[1]/div[1]/div[2]/div/div/div/div[1]/div/div")));
+        composeBtn.click();
+		driver.findElement(By.xpath("//textarea[@name='to']")).sendKeys(RECIPIENTS);
+		driver.findElement(By.xpath("//input[@name='subjectbox']")).sendKeys("selenium test");
+
+	}
+
+	@And("^I click \"attach\" icon$")
+	public void I_click_attach_icon() throws Throwable {
 		WebElement attach = (new WebDriverWait(driver, 10))
 	            .until(ExpectedConditions.elementToBeClickable(By.id(":qx")));
 
 		attach.click();
 		
+
+		
+	}
+
+	@And("^I select image in popup$")
+	public void I_select_image_in_popup() throws Throwable {
 		//Copy your file's absolute path to the clipboard
-		StringSelection ss = new StringSelection(attchment);
+		StringSelection ss = new StringSelection(ATTACHMENT);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
 	
 		
@@ -159,28 +120,53 @@ public class seleniumScript {
 		robot.keyRelease(KeyEvent.VK_CONTROL);
 		robot.keyPress(KeyEvent.VK_ENTER);
 		robot.keyRelease(KeyEvent.VK_ENTER);
+
+	}
+	
+	@And("^I select images in popup$")
+	public void I_select_images_in_popup() throws Throwable {
+		//Copy your file's absolute path to the clipboard
+		StringSelection ss = new StringSelection(ATTACHMENTS);
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
+	
 		
-		
-    }
-    
-    //click send button
-	private static void send() throws InterruptedException {
+		//native key strokes for CTRL, V and ENTER keys
+		Robot robot = new Robot();
+
+		robot.delay(1000);
+		robot.keyPress(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_V);
+		robot.keyRelease(KeyEvent.VK_CONTROL);
+		robot.keyPress(KeyEvent.VK_ENTER);
+		robot.keyRelease(KeyEvent.VK_ENTER);
+
+	}
+
+	@And("^I press \"Send\"$")
+	public void I_press_Send_() throws Throwable {
 		Thread.sleep(5000);
 		
         WebElement sendBtn = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.elementToBeClickable(By.id(":p5")));
         sendBtn.click();
-        
+
 	}
-	// the email was sent
-	private static void confirmSent() {
+
+	@Then("^the email is sent$")
+	public void the_email_is_sent() throws Throwable {
 		   WebElement messageSent = (new WebDriverWait(driver, 10))
 	        		.until(ExpectedConditions.elementToBeClickable(By.className("bAq")));
 	    	
 	        if (messageSent != null) {
 	        	System.out.println("confirm: email sent");
 	        }
+			driver.quit();
 	}
-
+	
+	@AfterClass
+	public void finish() {
+		driver.manage().deleteAllCookies();
+	}
 
 }
