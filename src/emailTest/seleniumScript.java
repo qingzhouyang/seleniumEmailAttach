@@ -1,3 +1,14 @@
+/*
+ * ECSE 428 Assignment B
+ * 
+ * 	Jiawei Ni   260615965
+ *	jiawei.ni@mail.mcgill.ca
+ *	
+ *	Qingzhou Yang  260687570
+ * 	qingzhou.yang@mail.mcgill.ca
+ * 
+ * */
+
 package emailTest;
 import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
@@ -42,6 +53,27 @@ public class seleniumScript {
 		send();
 		confirmSent();
 		finish();
+		
+		//two recipients, one attachment
+		init();
+		login();
+		composeEmail();
+		fillRecipient(RECIPIENTS);
+		attach(ATTACHMENT);
+		send();
+		confirmSent();
+		finish();
+		
+		//one recipients, two attachments
+		init();
+		login();
+		composeEmail();
+		fillRecipient(RECIPIENT);
+		attach(ATTACHMENTS);
+		send();
+		confirmSent();
+		finish();
+		
 		//two recipients two attachments
 		init();		
 		login();
@@ -103,18 +135,12 @@ public class seleniumScript {
 		driver.findElement(By.xpath("//textarea[@name='to']")).sendKeys(recipient);
 		driver.findElement(By.xpath("//input[@name='subjectbox']")).sendKeys("selenium test");
 
-		
-	//	driver.findElement(By.id(":pf")).sendKeys("selenium test");
-		
-		
-		
+
     }
     private static void attach(String attchment) throws Throwable {
 		WebElement attach = (new WebDriverWait(driver, 10))
 	            .until(ExpectedConditions.elementToBeClickable(By.id(":qx")));
-//    	WebElement attach = (new WebDriverWait(driver, 10))
-//	            .until(ExpectedConditions.elementToBeClickable(By.className("J-J5-Ji J-Z-I-J6-H")));
-		
+
 		attach.click();
 		
 		//Copy your file's absolute path to the clipboard
@@ -124,12 +150,7 @@ public class seleniumScript {
 		
 		//native key strokes for CTRL, V and ENTER keys
 		Robot robot = new Robot();
-//	    try {
-//	    	robot = new Robot();
-//	    } catch (AWTException e) {
-//	        e.printStackTrace();
-//	    }
-	
+
 		robot.delay(1000);
 		robot.keyPress(KeyEvent.VK_CONTROL);
 		robot.keyPress(KeyEvent.VK_V);
@@ -140,17 +161,17 @@ public class seleniumScript {
 		
 		
     }
+    
+    //click send button
 	private static void send() throws InterruptedException {
 		Thread.sleep(5000);
 		
-	//	new WebDriverWait(driver, 2).until(ExpectedConditions.invisibilityOfElementLocated(By.id(":u8")));
-		//
         WebElement sendBtn = (new WebDriverWait(driver, 10))
                 .until(ExpectedConditions.elementToBeClickable(By.id(":p5")));
         sendBtn.click();
         
 	}
-	
+	// the email was sent
 	private static void confirmSent() {
 		   WebElement messageSent = (new WebDriverWait(driver, 10))
 	        		.until(ExpectedConditions.elementToBeClickable(By.className("bAq")));
